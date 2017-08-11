@@ -1,8 +1,8 @@
-import Ember from 'ember';
+import EmberError from '@ember/error';
 
 import { isEnabled } from 'ember-data/-private';
 import testInDebug from 'dummy/tests/helpers/test-in-debug';
-import {module, test} from 'qunit';
+import { module, test } from 'qunit';
 
 import DS from 'ember-data';
 
@@ -12,7 +12,7 @@ test('DS.AdapterError', function(assert) {
   let error = new DS.AdapterError();
 
   assert.ok(error instanceof Error);
-  assert.ok(error instanceof Ember.Error);
+  assert.ok(error instanceof EmberError);
   assert.ok(error.isAdapterError);
   assert.equal(error.message, 'Adapter operation failed');
 });

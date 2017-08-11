@@ -1,3 +1,14 @@
+import ComputedProperty from '@ember/object/computed';
+import { setOwner } from '@ember/application';
+import { isNone } from '@ember/utils';
+import EmberError from '@ember/error';
+import Evented from '@ember/object/evented';
+import EmberObject, {
+  computed,
+  get,
+  observer
+} from '@ember/object';
+import Map from '@ember/map';
 import Ember from 'ember';
 import { DEBUG } from '@glimmer/env';
 import { assert, deprecate, warn } from '@ember/debug';
@@ -10,12 +21,6 @@ import {
   relatedTypesDescriptor,
   relationshipsDescriptor
 } from '../relationships/ext';
-
-const {
-  get,
-  computed,
-  Map
-} = Ember;
 
 /**
   @module ember-data
@@ -81,7 +86,7 @@ const retrieveFromCurrentState = computed('currentState', function(key) {
   @extends Ember.Object
   @uses Ember.Evented
 */
-const Model = Ember.Object.extend(Ember.Evented, {
+const Model = EmberObject.extend(Evented, {
   _internalModel: null,
   store: null,
   __defineNonEnumerable(property) {
@@ -973,7 +978,7 @@ const Model = Ember.Object.extend(Ember.Evented, {
     return this._internalModel.referenceFor('hasMany', name);
   },
 
-  setId: Ember.observer('id', function () {
+  setId: observer('id', function () {
     this._internalModel.setId(this.get('id'));
   }),
 
@@ -1137,7 +1142,7 @@ if (DEBUG) {
       this._super(...arguments);
 
       if (!this._internalModel) {
-        throw new Ember.Error('You should not call `create` on a model. Instead, call `store.createRecord` with the attributes you would like to set.');
+        throw new EmberError('You should not call `create` on a model. Instead, call `store.createRecord` with the attributes you would like to set.');
       }
     }
   });
@@ -1229,7 +1234,7 @@ Model.reopenClass({
     return relationship && store.modelFor(relationship.type);
   },
 
-  inverseMap: Ember.computed(function() {
+  inverseMap: computed(function() {
     return Object.create(null);
   }),
 
@@ -1306,10 +1311,10 @@ Model.reopenClass({
     //If inverse is specified manually, return the inverse
     if (options.inverse) {
       inverseName = options.inverse;
-      inverse = Ember.get(inverseType, 'relationshipsByName').get(inverseName);
+      inverse = get(inverseType, 'relationshipsByName').get(inverseName);
 
       assert("We found no inverse relationships by the name of '" + inverseName + "' on the '" + inverseType.modelName +
-        "' model. This is most likely due to a missing attribute on your model definition.", !Ember.isNone(inverse));
+        "' model. This is most likely due to a missing attribute on your model definition.", !isNone(inverse));
 
       inverseKind = inverse.kind;
     } else {
@@ -1429,7 +1434,7 @@ Model.reopenClass({
    @type Object
    @readOnly
    */
-  relationshipNames: Ember.computed(function() {
+  relationshipNames: computed(function() {
     let names = {
       hasMany: [],
       belongsTo: []
@@ -1558,7 +1563,7 @@ Model.reopenClass({
    @type Ember.Map
    @readOnly
    */
-  fields: Ember.computed(function() {
+  fields: computed(function() {
     let map = Map.create();
 
     this.eachComputedProperty((name, meta) => {
@@ -1667,7 +1672,7 @@ Model.reopenClass({
    @type {Ember.Map}
    @readOnly
    */
-  attributes: Ember.computed(function() {
+  attributes: computed(function() {
     let map = Map.create();
 
     this.eachComputedProperty((name, meta) => {
@@ -1720,7 +1725,7 @@ Model.reopenClass({
    @type {Ember.Map}
    @readOnly
    */
-  transformedAttributes: Ember.computed(function() {
+  transformedAttributes: computed(function() {
     let map = Map.create();
 
     this.eachAttribute((key, meta) => {
@@ -1837,7 +1842,7 @@ Model.reopenClass({
 // deprecation is actually created via an `.extend` of the factory
 // inside the container itself, but that only happens on models
 // with MODEL_FACTORY_INJECTIONS enabled :(
-if (Ember.setOwner) {
+if (setOwner) {
   Object.defineProperty(Model.prototype, 'container', {
     configurable: true,
     enumerable: false,
@@ -1914,7 +1919,7 @@ if (DEBUG) {
      */
     didDefineProperty(proto, key, value) {
       // Check if the value being set is a computed property.
-      if (value instanceof Ember.ComputedProperty) {
+      if (value instanceof ComputedProperty) {
 
         // If it is, get the metadata for the relationship. This is
         // populated by the `DS.belongsTo` helper when it is creating

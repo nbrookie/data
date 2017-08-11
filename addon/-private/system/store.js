@@ -2,14 +2,21 @@
   @module ember-data
 */
 
+import { A } from '@ember/array';
+
+import { copy } from '@ember/object/internals';
+import EmberError from '@ember/error';
+import MapWithDefault from '@ember/map/with-default';
+import { run as emberRun } from '@ember/runloop';
+import { set, get, computed } from '@ember/object';
+import RSVP from 'rsvp';
+import Service from '@ember/service';
+import { typeOf, isPresent, isNone } from '@ember/utils';
+
 import Ember from 'ember';
 import { InvalidError } from '../adapters/errors';
 import { instrument } from 'ember-data/-debug';
-import {
-  assert,
-  deprecate,
-  warn
-} from '@ember/debug';
+import { assert, deprecate, warn, inspect } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 import Model from './model/model';
 import normalizeModelName from "./normalize-model-name";
@@ -50,22 +57,8 @@ import isEnabled from '../features';
 const badIdFormatAssertion = '`id` passed to `findRecord()` has to be non-empty string or number';
 
 const {
-  A,
   _Backburner: Backburner,
-  computed,
-  copy,
-  ENV,
-  Error: EmberError,
-  get,
-  inspect,
-  isNone,
-  isPresent,
-  MapWithDefault,
-  run: emberRun,
-  set,
-  RSVP,
-  Service,
-  typeOf
+  ENV
 } = Ember;
 
 const { Promise } = RSVP;

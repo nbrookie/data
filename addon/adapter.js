@@ -2,7 +2,7 @@
   @module ember-data
 */
 
-import Ember from 'ember';
+import EmberObject from '@ember/object';
 
 /**
   An adapter is an object that receives requests from a store and
@@ -60,7 +60,7 @@ import Ember from 'ember';
   @extends Ember.Object
 */
 
-export default Ember.Object.extend({
+export default EmberObject.extend({
 
   /**
     If you would like your adapter to use a custom serializer you can

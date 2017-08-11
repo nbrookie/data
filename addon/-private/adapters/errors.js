@@ -1,9 +1,9 @@
-import Ember from 'ember';
+import { makeArray } from '@ember/array';
+import { isPresent } from '@ember/utils';
+import EmberError from '@ember/error';
 import { assert } from '@ember/debug';
 
 import isEnabled from '../features';
-
-const EmberError = Ember.Error;
 
 const SOURCE_POINTER_REGEXP = /^\/?data\/(attributes|relationships)\/(.*)/;
 const SOURCE_POINTER_PRIMARY_REGEXP = /^\/?data/;
@@ -388,9 +388,9 @@ export const ServerError = extendedErrorsEnabled ?
 export function errorsHashToArray(errors) {
   let out = [];
 
-  if (Ember.isPresent(errors)) {
+  if (isPresent(errors)) {
     Object.keys(errors).forEach((key) => {
-      let messages = Ember.makeArray(errors[key]);
+      let messages = makeArray(errors[key]);
       for (let i = 0; i < messages.length; i++) {
         let title = 'Invalid Attribute';
         let pointer = `/data/attributes/${key}`;
@@ -455,7 +455,7 @@ export function errorsHashToArray(errors) {
 export function errorsArrayToHash(errors) {
   let out = {};
 
-  if (Ember.isPresent(errors)) {
+  if (isPresent(errors)) {
     errors.forEach((error) => {
       if (error.source && error.source.pointer) {
         let key = error.source.pointer.match(SOURCE_POINTER_REGEXP);

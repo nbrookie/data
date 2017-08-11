@@ -1,6 +1,14 @@
+import { assign, merge } from '@ember/polyfills';
+import { set, get } from '@ember/object';
+import { copy } from '@ember/object/internals';
+import EmberError from '@ember/error';
+import { isEqual, isEmpty } from '@ember/utils';
+import { setOwner } from '@ember/application';
+import { run } from '@ember/runloop';
+import RSVP, { Promise } from 'rsvp';
 import Ember from 'ember';
 import { DEBUG } from '@glimmer/env';
-import { assert } from '@ember/debug';
+import { assert, inspect } from '@ember/debug';
 import RootState from "./states";
 import Relationships from "../relationships/state/create";
 import Snapshot from "../snapshot";
@@ -15,21 +23,7 @@ import {
   HasManyReference
 } from "../references";
 
-const {
-  get,
-  set,
-  copy,
-  Error: EmberError,
-  inspect,
-  isEmpty,
-  isEqual,
-  setOwner,
-  run,
-  RSVP,
-  RSVP: { Promise }
-} = Ember;
-
-const assign = Ember.assign || Ember.merge;
+const emberAssign = assign || merge;
 
 /*
   The TransitionChainMap caches the `state.enters`, `state.setups`, and final state reached
@@ -337,7 +331,7 @@ export default class InternalModel {
       };
 
       if (typeof properties === 'object' && properties !== null) {
-        assign(createOptions, properties);
+        emberAssign(createOptions, properties);
       }
 
       if (setOwner) {
@@ -582,7 +576,7 @@ export default class InternalModel {
       changedKeys = this._changedKeys(data.attributes);
     }
 
-    assign(this._data, data.attributes);
+    emberAssign(this._data, data.attributes);
     this.pushedData();
 
     if (this.hasRecord) {
@@ -704,7 +698,7 @@ export default class InternalModel {
     let oldData = this._data;
     let currentData = this._attributes;
     let inFlightData = this._inFlightAttributes;
-    let newData = assign(copy(inFlightData), currentData);
+    let newData = emberAssign(copy(inFlightData), currentData);
     let diffData = Object.create(null);
     let newDataKeys = Object.keys(newData);
 
@@ -1096,9 +1090,9 @@ export default class InternalModel {
     this.didCleanError();
     let changedKeys = this._changedKeys(data);
 
-    assign(this._data, this._inFlightAttributes);
+    emberAssign(this._data, this._inFlightAttributes);
     if (data) {
-      assign(this._data, data);
+      emberAssign(this._data, data);
     }
 
     this._inFlightAttributes = null;
@@ -1226,8 +1220,8 @@ export default class InternalModel {
         attrs= this._attributes;
       }
 
-      original = assign(Object.create(null), this._data);
-      original = assign(original, this._inFlightAttributes);
+      original = emberAssign(Object.create(null), this._data);
+      original = emberAssign(original, this._inFlightAttributes);
 
       for (i = 0; i < length; i++) {
         key = keys[i];

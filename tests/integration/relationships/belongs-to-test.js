@@ -1,12 +1,14 @@
+import { get } from '@ember/object';
+import { run } from '@ember/runloop';
+import RSVP, { resolve } from 'rsvp';
 import setupStore from 'dummy/tests/helpers/store';
 import Ember from 'ember';
 
 import testInDebug from 'dummy/tests/helpers/test-in-debug';
-import {module, test} from 'qunit';
+import { module, test } from 'qunit';
 
 import DS from 'ember-data';
 
-const { get, run, RSVP } = Ember;
 const { attr, hasMany, belongsTo } = DS;
 const { hash } = RSVP;
 
@@ -100,7 +102,7 @@ test("The store can materialize a non loaded monomorphic belongsTo association",
   env.adapter.shouldBackgroundReloadRecord = () => false;
   env.adapter.findRecord = function(store, type, id, snapshot) {
     assert.ok(true, "The adapter's find method should be called");
-    return Ember.RSVP.resolve({
+    return resolve({
       data: {
         id,
         type: snapshot.modelName
@@ -328,7 +330,7 @@ test("A serializer can materialize a belongsTo as a link that gets sent back to 
     assert.equal(relationship.key, 'group');
     assert.equal(link, "/people/1/group");
 
-    return Ember.RSVP.resolve({
+    return resolve({
       data: {
         id: 1,
         type: 'group',
@@ -385,7 +387,7 @@ test('A record with an async belongsTo relationship always returns a promise for
   };
 
   env.adapter.findBelongsTo = function(store, snapshot, link, relationship) {
-    return Ember.RSVP.resolve({ data: { id: 1, type: 'seat' } });
+    return resolve({ data: { id: 1, type: 'seat' } });
   };
 
   return run(() => {
@@ -436,7 +438,7 @@ test("A record with an async belongsTo relationship returning null should resolv
   };
 
   env.adapter.findBelongsTo = function(store, snapshot, link, relationship) {
-    return Ember.RSVP.resolve({ data: null });
+    return resolve({ data: null });
   };
 
   return env.store.findRecord('person', '1').then(person => {
@@ -862,7 +864,7 @@ test("belongsTo hasData async loaded", function(assert) {
   });
 
   env.adapter.findRecord = function(store, type, id, snapshot) {
-    return Ember.RSVP.resolve({
+    return resolve({
       data: {
         id: 1,
         type: 'book',
@@ -886,7 +888,7 @@ test("belongsTo hasData sync loaded", function(assert) {
   assert.expect(1);
 
   env.adapter.findRecord = function(store, type, id, snapshot) {
-    return Ember.RSVP.resolve({
+    return resolve({
       data: {
         id: 1,
         type: 'book',
@@ -914,7 +916,7 @@ test("belongsTo hasData async not loaded", function(assert) {
   });
 
   env.adapter.findRecord = function(store, type, id, snapshot) {
-    return Ember.RSVP.resolve({
+    return resolve({
       data: {
         id: 1,
         type: 'book',
@@ -938,7 +940,7 @@ test("belongsTo hasData sync not loaded", function(assert) {
   assert.expect(1);
 
   env.adapter.findRecord = function(store, type, id, snapshot) {
-    return Ember.RSVP.resolve({
+    return resolve({
       data: {
         id: 1,
         type: 'book',
@@ -1061,7 +1063,7 @@ test("Related link should be fetched when no local data is present", function(as
   env.adapter.findBelongsTo = function(store, snapshot, url, relationship) {
     assert.equal(url, 'author', 'url is correct');
     assert.ok(true, "The adapter's findBelongsTo method should be called");
-    return Ember.RSVP.resolve({
+    return resolve({
       data: {
         id: 1,
         type: 'author',
@@ -1103,7 +1105,7 @@ test("Local data should take precedence over related link", function(assert) {
   };
 
   env.adapter.findRecord = function(store, type, id, snapshot) {
-    return Ember.RSVP.resolve({
+    return resolve({
       data: {
         id: 1,
         type: 'author',
@@ -1144,7 +1146,7 @@ test("New related link should take precedence over local data", function(assert)
   env.adapter.findBelongsTo = function(store, snapshot, url, relationship) {
     assert.equal(url, 'author-new-link', 'url is correct');
     assert.ok(true, "The adapter's findBelongsTo method should be called");
-    return Ember.RSVP.resolve({
+    return resolve({
       data: {
         id: 1,
         type: 'author',
@@ -1203,7 +1205,7 @@ test("Updated related link should take precedence over local data", function(ass
   env.adapter.findBelongsTo = function(store, snapshot, url, relationship) {
     assert.equal(url, 'author-updated-link', 'url is correct');
     assert.ok(true, "The adapter's findBelongsTo method should be called");
-    return Ember.RSVP.resolve({
+    return resolve({
       data: {
         id: 1,
         type: 'author',
@@ -1332,7 +1334,7 @@ test("A belongsTo relationship can be reloaded using the reference if it was fet
   });
 
   env.adapter.findRecord = function() {
-    return Ember.RSVP.resolve({
+    return resolve({
       data: {
         id: 1,
         type: 'chapter',
@@ -1346,7 +1348,7 @@ test("A belongsTo relationship can be reloaded using the reference if it was fet
   };
 
   env.adapter.findBelongsTo = function() {
-    return Ember.RSVP.resolve({
+    return resolve({
       data: {
         id: 1,
         type: 'book',
@@ -1366,7 +1368,7 @@ test("A belongsTo relationship can be reloaded using the reference if it was fet
       assert.equal(book.get('name'), "book title");
 
       env.adapter.findBelongsTo = function() {
-        return Ember.RSVP.resolve({
+        return resolve({
           data: {
             id: 1,
             type: 'book',
@@ -1412,7 +1414,7 @@ test("A sync belongsTo relationship can be reloaded using a reference if it was 
   });
 
   env.adapter.findRecord = function() {
-    return Ember.RSVP.resolve({
+    return resolve({
       data: {
         id: 1,
         type: 'book',
@@ -1452,7 +1454,7 @@ test("A belongsTo relationship can be reloaded using a reference if it was fetch
   });
 
   env.adapter.findRecord = function() {
-    return Ember.RSVP.resolve({
+    return resolve({
       data: {
         id: 1,
         type: 'book',
@@ -1466,7 +1468,7 @@ test("A belongsTo relationship can be reloaded using a reference if it was fetch
       assert.equal(book.get('name'), "book title");
 
       env.adapter.findRecord = function() {
-        return Ember.RSVP.resolve({
+        return resolve({
           data: {
             id: 1,
             type: 'book',

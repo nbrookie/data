@@ -1,7 +1,11 @@
-import Ember from 'ember';
+import { mapBy, not } from '@ember/object/computed';
+import Evented from '@ember/object/evented';
+import ArrayProxy from '@ember/array/proxy';
+import { set, get, computed } from '@ember/object';
+import { isEmpty } from '@ember/utils';
+import { makeArray, A } from '@ember/array';
+import MapWithDefault from '@ember/map/with-default';
 import { deprecate, warn } from '@ember/debug';
-
-const { get, set, isEmpty, makeArray, MapWithDefault } = Ember;
 
 /**
 @module ember-data
@@ -82,7 +86,7 @@ const { get, set, isEmpty, makeArray, MapWithDefault } = Ember;
   @uses Ember.Enumerable
   @uses Ember.Evented
  */
-export default Ember.ArrayProxy.extend(Ember.Evented, {
+export default ArrayProxy.extend(Evented, {
   /**
     Register with target handler
 
@@ -120,10 +124,10 @@ export default Ember.ArrayProxy.extend(Ember.Evented, {
     @type {Ember.MapWithDefault}
     @private
   */
-  errorsByAttributeName: Ember.computed(function() {
+  errorsByAttributeName: computed(function() {
     return MapWithDefault.create({
       defaultValue() {
-        return Ember.A();
+        return A();
       }
     });
   }),
@@ -165,15 +169,15 @@ export default Ember.ArrayProxy.extend(Ember.Evented, {
     @property messages
     @type {Array}
   */
-  messages: Ember.computed.mapBy('content', 'message'),
+  messages: mapBy('content', 'message'),
 
   /**
     @property content
     @type {Array}
     @private
   */
-  content: Ember.computed(function() {
-    return Ember.A();
+  content: computed(function() {
+    return A();
   }),
 
   /**
@@ -199,7 +203,7 @@ export default Ember.ArrayProxy.extend(Ember.Evented, {
     @type {Boolean}
     @readOnly
   */
-  isEmpty: Ember.computed.not('length').readOnly(),
+  isEmpty: not('length').readOnly(),
 
   /**
     Adds error messages to a given attribute and sends
@@ -382,7 +386,7 @@ export default Ember.ArrayProxy.extend(Ember.Evented, {
     if (get(this, 'isEmpty')) { return; }
 
     let errorsByAttributeName = get(this, 'errorsByAttributeName');
-    let attributes = Ember.A();
+    let attributes = A();
 
     errorsByAttributeName.forEach(function(_, attribute) {
       attributes.push(attribute);
@@ -393,7 +397,7 @@ export default Ember.ArrayProxy.extend(Ember.Evented, {
       this.notifyPropertyChange(attribute);
     }, this);
 
-    Ember.ArrayProxy.prototype.clear.call(this);
+    ArrayProxy.prototype.clear.call(this);
   },
 
 

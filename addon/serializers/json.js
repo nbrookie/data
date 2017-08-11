@@ -1,4 +1,6 @@
-import Ember from 'ember';
+import { assign, merge } from '@ember/polyfills';
+import { isNone, typeOf } from '@ember/utils';
+import { get } from '@ember/object';
 import { assert, deprecate, warn } from '@ember/debug';
 import Serializer from "../serializer";
 import {
@@ -10,9 +12,7 @@ import {
   isEnabled
 } from '../-private';
 
-const get = Ember.get;
-const isNone = Ember.isNone;
-const assign = Ember.assign || Ember.merge;
+const emberAssign = assign || merge;
 
 /**
   Ember Data 2.0 Serializer:
@@ -458,7 +458,7 @@ const JSONSerializer = Serializer.extend({
 
     let meta = this.extractMeta(store, primaryModelClass, payload);
     if (meta) {
-      assert('The `meta` returned from `extractMeta` has to be an object, not "' + Ember.typeOf(meta) + '".', Ember.typeOf(meta) === 'object');
+      assert('The `meta` returned from `extractMeta` has to be an object, not "' + typeOf(meta) + '".', typeOf(meta) === 'object');
       documentHash.meta = meta;
     }
 
@@ -530,7 +530,7 @@ const JSONSerializer = Serializer.extend({
 
     if (resourceHash) {
       this.normalizeUsingDeclaredMapping(modelClass, resourceHash);
-      if (Ember.typeOf(resourceHash.links) === 'object') {
+      if (typeOf(resourceHash.links) === 'object') {
         this.normalizeUsingDeclaredMapping(modelClass, resourceHash.links);
       }
 
@@ -596,13 +596,13 @@ const JSONSerializer = Serializer.extend({
     @return {Object}
   */
   extractRelationship(relationshipModelName, relationshipHash) {
-    if (Ember.isNone(relationshipHash)) { return null; }
+    if (isNone(relationshipHash)) { return null; }
     /*
       When `relationshipHash` is an object it usually means that the relationship
       is polymorphic. It could however also be embedded resources that the
       EmbeddedRecordsMixin has be able to process.
     */
-    if (Ember.typeOf(relationshipHash) === 'object') {
+    if (typeOf(relationshipHash) === 'object') {
       if (relationshipHash.id) {
         relationshipHash.id = coerceId(relationshipHash.id);
       }
@@ -687,7 +687,7 @@ const JSONSerializer = Serializer.extend({
             data = this.extractRelationship(relationshipMeta.type, relationshipHash);
           }
         } else if (relationshipMeta.kind === 'hasMany') {
-          if (!Ember.isNone(relationshipHash)) {
+          if (!isNone(relationshipHash)) {
             data = new Array(relationshipHash.length);
             for (let i = 0, l = relationshipHash.length; i < l; i++) {
               let item = relationshipHash[i];
@@ -1084,7 +1084,7 @@ const JSONSerializer = Serializer.extend({
     @param {Object} options
   */
   serializeIntoHash(hash, typeClass, snapshot, options) {
-    assign(hash, this.serialize(snapshot, options));
+    emberAssign(hash, this.serialize(snapshot, options));
   },
 
   /**

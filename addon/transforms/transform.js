@@ -1,4 +1,4 @@
-import Ember from 'ember';
+import EmberObject from '@ember/object';
 
 /**
   The `DS.Transform` class is used to serialize and deserialize model
@@ -67,7 +67,7 @@ import Ember from 'ember';
   @class Transform
   @namespace DS
  */
-export default Ember.Object.extend({
+export default EmberObject.extend({
   /**
     When given a deserialized value from a record attribute this
     method must return the serialized value.

@@ -2,15 +2,15 @@
   @module ember-data
 */
 
-import Ember from 'ember';
+import { typeOf, isNone } from '@ember/utils';
+
+import { dasherize } from '@ember/string';
 import { pluralize, singularize } from 'ember-inflector';
 import { assert, deprecate, warn } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
 import JSONSerializer from './json';
 import { normalizeModelName, isEnabled } from '../-private';
-
-const dasherize = Ember.String.dasherize;
 
 /**
   Ember Data 2.0 Serializer:
@@ -138,7 +138,7 @@ const JSONAPISerializer = JSONSerializer.extend({
   */
   _normalizeDocumentHelper(documentHash) {
 
-    if (Ember.typeOf(documentHash.data) === 'object') {
+    if (typeOf(documentHash.data) === 'object') {
       documentHash.data = this._normalizeResourceHelper(documentHash.data);
     } else if (Array.isArray(documentHash.data)) {
       let ret = new Array(documentHash.data.length);
@@ -200,7 +200,7 @@ const JSONAPISerializer = JSONSerializer.extend({
     @private
   */
   _normalizeResourceHelper(resourceHash) {
-    assert(this.warnMessageForUndefinedType(), !Ember.isNone(resourceHash.type), {
+    assert(this.warnMessageForUndefinedType(), !isNone(resourceHash.type), {
       id: 'ds.serializer.type-is-undefined'
     });
 
@@ -301,7 +301,7 @@ const JSONAPISerializer = JSONSerializer.extend({
 
   extractRelationship(relationshipHash) {
 
-    if (Ember.typeOf(relationshipHash.data) === 'object') {
+    if (typeOf(relationshipHash.data) === 'object') {
       relationshipHash.data = this._normalizeRelationshipDataHelper(relationshipHash.data);
     }
 
@@ -740,7 +740,7 @@ if (DEBUG) {
   JSONAPISerializer.reopen({
     willMergeMixin(props) {
       let constructor = this.constructor;
-      warn(`You've defined 'extractMeta' in ${constructor.toString()} which is not used for serializers extending JSONAPISerializer. Read more at https://emberjs.com/api/data/classes/DS.JSONAPISerializer.html#toc_customizing-meta on how to customize meta when using JSON API.`, Ember.isNone(props.extractMeta) || props.extractMeta === JSONSerializer.prototype.extractMeta, {
+      warn(`You've defined 'extractMeta' in ${constructor.toString()} which is not used for serializers extending JSONAPISerializer. Read more at https://emberjs.com/api/data/classes/DS.JSONAPISerializer.html#toc_customizing-meta on how to customize meta when using JSON API.`, isNone(props.extractMeta) || props.extractMeta === JSONSerializer.prototype.extractMeta, {
         id: 'ds.serializer.json-api.extractMeta'
       });
       warn('The JSONAPISerializer does not work with the EmbeddedRecordsMixin because the JSON API spec does not describe how to format embedded resources.', !props.isEmbeddedRecordsMixin, {
